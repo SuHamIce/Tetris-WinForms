@@ -12,7 +12,7 @@ namespace Tetirs
 
         public int Type { get; private set; }
         private bool isVertical = false;
-
+        
         private static Random rand = new Random();
         private static List<Color> colorBag = new List<Color>();
         private static readonly Color[] palette = { Color.Red, Color.Blue, Color.Green, Color.Orange, Color.Purple, Color.Cyan, Color.Yellow };
@@ -43,6 +43,7 @@ namespace Tetirs
             X = 3;
             Y = 0;
 
+            // 根据类型初始化不同的方块 (标准的 7 种)
             switch (type)
             {
                 case 0: // I型
@@ -71,6 +72,7 @@ namespace Tetirs
             this.BlockColor = GetNextColor();
         }
 
+        // 旋转逻辑（完美适配不同大小的矩阵）
         public void Rotate()
         {
             if (Type == 3)
@@ -104,14 +106,14 @@ namespace Tetirs
             }
             else
             {
-                int size = Shape.GetLength(0);
-                int[,] newShape = new int[size, size];
-                for (int i = 0; i < size; i++)
-                    for (int j = 0; j < size; j++)
-                        newShape[i, j] = Shape[size - 1 - j, i];
-                Shape = newShape;
-            }
+            int size = Shape.GetLength(0);
+            int[,] newShape = new int[size, size];
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < size; j++)
+                    newShape[i, j] = Shape[size - 1 - j, i];
+            Shape = newShape;
         }
+    }
 
         public void RollbackRotate()
         {

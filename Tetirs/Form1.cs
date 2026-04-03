@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Tetirs
@@ -8,9 +14,17 @@ namespace Tetirs
     {
         GameEngine engine;
 
+        int[,] map = new int[Rows, Cols];
+
+        Block currentBlock;
+        Block nextBlock;
+
+        Random rand = new Random();
+
         public Form1()
         {
             InitializeComponent();
+
             this.DoubleBuffered = true;
 
             // 笔记本好像有个屏幕缩放的设置，通过这里统一一下窗体
@@ -26,16 +40,16 @@ namespace Tetirs
         private void gameTimer_Tick(object sender, EventArgs e)
         {
             engine.GameTick();
-
+            
             lblScore.Text = engine.Score.ToString();
 
             if (engine.IsGameOver)
-            {
+        {
                 gameTimer.Stop();
                 DialogResult result = MessageBox.Show("游戏结束！要再来一局吗？", "俄罗斯方块", MessageBoxButtons.YesNo);
 
                 if (result == DialogResult.Yes)
-                {
+            {
                     engine.ResetGame();
                     engine.SpawnBlock();
                     btnControl.Text = "暂停游戏";
@@ -44,12 +58,55 @@ namespace Tetirs
                 else
                 {
                     this.Close();
+                    }
                 }
             }
+            return true;
+        }
 
             pbGameField.Invalidate();
             pbNextBlock.Invalidate();
+                        }
+                    }
+                }
+            }
         }
+
+        //private void Form1_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    if (currentBlock == null) return;
+
+        //    switch (e.KeyCode)
+        //    {
+        //        case Keys.Left:
+        //            if (IsValid(currentBlock.X - 1, currentBlock.Y)) currentBlock.X--;
+        //            break;
+        //        case Keys.Right:
+        //            if (IsValid(currentBlock.X + 1, currentBlock.Y)) currentBlock.X++;
+        //            break;
+        //        case Keys.Down:
+        //            if (IsValid(currentBlock.X, currentBlock.Y + 1)) currentBlock.Y++;
+        //            break;
+        //        case Keys.Up:
+        //            currentBlock.Rotate();
+        //            // 如果旋转后位置非法（比如撞墙），则尝试回滚
+        //            if (!IsValid(currentBlock.X, currentBlock.Y))
+        //            {
+        //                // 简单的回滚：连续旋转三次回到原位
+        //                for (int i = 0; i < 3; i++) currentBlock.Rotate();
+        //            }
+        //            break;
+        //        case Keys.Space:
+        //            if (currentBlock == null || !gameTimer.Enabled) return;
+        //            while (IsValid(currentBlock.X, currentBlock.Y + 1))
+        //            {
+        //                currentBlock.Y++;
+        //            }
+        //            gameTimer_Tick(null, null);
+        //            break;
+        //    }
+        //    pbGameField.Invalidate();
+        //}
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -71,9 +128,33 @@ namespace Tetirs
                     break;
             }
 
-            pbGameField.Invalidate();
+                case Keys.Right:
+                    if (IsValid(currentBlock.X + 1, currentBlock.Y)) currentBlock.X++;
+                    pbGameField.Invalidate();
             pbNextBlock.Invalidate();
-            return true;
+                    return true;
+
+                case Keys.Down:
+                    if (IsValid(currentBlock.X, currentBlock.Y + 1)) currentBlock.Y++;
+                    pbGameField.Invalidate();
+                    return true;
+
+                case Keys.Up:
+                    currentBlock.Rotate();
+                    if (!IsValid(currentBlock.X, currentBlock.Y))
+                        for (int i = 0; i < 3; i++) currentBlock.Rotate();
+                    pbGameField.Invalidate();
+                    return true;
+
+                case Keys.Space:
+                    while (IsValid(currentBlock.X, currentBlock.Y + 1))
+                    {
+                        currentBlock.Y++;
+                    }
+                    gameTimer_Tick(null, null);
+                    return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         private void pbGameField_Paint(object sender, PaintEventArgs e)
@@ -88,39 +169,48 @@ namespace Tetirs
 
             // 2. 画已经固定的地图方块
             for (int i = 0; i < engine.Rows; i++)
-            {
-                for (int j = 0; j < engine.Cols; j++)
                 {
-                    if (engine.Map[i, j] != 0)
+                for (int j = 0; j < engine.Cols; j++)
                     {
+                    if (engine.Map[i, j] != 0)
+                        {
                         Color fixedColor = Color.FromArgb(engine.Map[i, j]);
                         float drawX = j * CellSize;
                         float drawY = i * CellSize;
 
                         g.FillRectangle(new SolidBrush(fixedColor), drawX, drawY, CellSize - 1, CellSize - 1);
                         g.DrawRectangle(Pens.White, drawX, drawY, CellSize - 1, CellSize - 1);
-                    }
-                }
             }
+        }
+
+        private void ResetGame()
+        {
+            map = new int[Rows, Cols];
+            score = 0;
+            lblScore.Text = "0";
+            btnControl.Text = "开始游戏";
+            SpawnBlock();
+            pbGameField.Invalidate();
+        }
 
             // 3. 画当前正在下落的方块
             if (engine.CurrentBlock != null)
-            {
+        {
                 int size = engine.CurrentBlock.Shape.GetLength(0);
                 for (int i = 0; i < size; i++)
-                {
+            {
                     for (int j = 0; j < size; j++)
-                    {
+                {
                         if (engine.CurrentBlock.Shape[i, j] == 1)
-                        {
+                    {
                             float drawX = (engine.CurrentBlock.X + j) * CellSize;
                             float drawY = (engine.CurrentBlock.Y + i) * CellSize;
 
                             g.FillRectangle(new SolidBrush(engine.CurrentBlock.BlockColor), drawX, drawY, CellSize - 1, CellSize - 1);
-                            g.DrawRectangle(Pens.White, drawX, drawY, CellSize - 1, CellSize - 1);
-                        }
+                        g.DrawRectangle(Pens.White, drawX, drawY, CellSize - 1, CellSize - 1);
                     }
                 }
+            }
             }
 
             // 4. 画幽灵方块投影 (Ghost Piece)
@@ -174,8 +264,12 @@ namespace Tetirs
                         if (i < minY) minY = i;
                         if (i > maxY) maxY = i;
                     }
+                    else
+                    {
+                        this.Close();
+                    }
+                    return;
                 }
-            }
 
             // 如果没有实体（按理说不可能发生），直接退出
             if (maxX == -1) return;
@@ -229,24 +323,32 @@ namespace Tetirs
                 pbNextBlock.Invalidate();
                 this.Focus();
             }
+
             this.ActiveControl = null;
         }
 
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
+
+            // 0. 检查控件是否已创建
             if (pbGameField == null || pbNextBlock == null || btnControl == null) return;
 
+            // 1. 【核心修复】：定义固定的游戏区大小，不随拉伸改变
+            // 如果你设计器里改了大小，这里也要同步改
             int gameWidth = 250;
             int gameHeight = 500;
             int sidebarWidth = 110;
             int gap = 20;
 
+            // 2. 计算总宽度（游戏区 + 间距 + 侧边栏）
             int totalContentWidth = gameWidth + gap + sidebarWidth;
             int startX = Math.Max(10, (this.ClientSize.Width - totalContentWidth) / 2);
             int startY = Math.Max(10, (this.ClientSize.Height - gameHeight) / 2);
 
+            // 4. 重新排布位置
             pbGameField.SetBounds(startX, startY, gameWidth, gameHeight);
+
             int sidebarX = startX + gameWidth + gap;
 
             if (lbw1 != null) lbw1.Location = new Point(sidebarX, startY);
