@@ -51,7 +51,7 @@
             // lblScore
             // 
             this.lblScore.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.lblScore.Location = new System.Drawing.Point(268, 171);
+            this.lblScore.Location = new System.Drawing.Point(270, 204);
             this.lblScore.Name = "lblScore";
             this.lblScore.Size = new System.Drawing.Size(100, 29);
             this.lblScore.TabIndex = 1;
@@ -61,7 +61,7 @@
             // pbNextBlock
             // 
             this.pbNextBlock.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.pbNextBlock.Location = new System.Drawing.Point(268, 23);
+            this.pbNextBlock.Location = new System.Drawing.Point(269, 89);
             this.pbNextBlock.Name = "pbNextBlock";
             this.pbNextBlock.Size = new System.Drawing.Size(100, 100);
             this.pbNextBlock.TabIndex = 2;
@@ -75,18 +75,19 @@
             // 
             // lbw1
             // 
-            this.lbw1.BackColor = System.Drawing.SystemColors.ControlDark;
-            this.lbw1.Font = new System.Drawing.Font("新愚公峥嵘体黑体版", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.lbw1.Location = new System.Drawing.Point(268, 126);
+            this.lbw1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.lbw1.Font = new System.Drawing.Font("字魂27号-布丁体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lbw1.ForeColor = System.Drawing.SystemColors.Info;
+            this.lbw1.Location = new System.Drawing.Point(268, 23);
             this.lbw1.Name = "lbw1";
-            this.lbw1.Size = new System.Drawing.Size(100, 45);
+            this.lbw1.Size = new System.Drawing.Size(100, 63);
             this.lbw1.TabIndex = 1;
-            this.lbw1.Text = "得分";
+            this.lbw1.Text = "下一个方块";
             this.lbw1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // btnControl
             // 
-            this.btnControl.Location = new System.Drawing.Point(268, 217);
+            this.btnControl.Location = new System.Drawing.Point(271, 245);
             this.btnControl.Name = "btnControl";
             this.btnControl.Size = new System.Drawing.Size(99, 72);
             this.btnControl.TabIndex = 3;
