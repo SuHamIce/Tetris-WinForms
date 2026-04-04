@@ -11,6 +11,36 @@ namespace Tetirs
         public Form1()
         {
             InitializeComponent();
+
+            btnControl.FlatAppearance.MouseOverBackColor = Color.FromArgb(80, 80, 85);
+
+            // 1. 窗体全局背景设为高级碳黑色
+            this.BackColor = Color.FromArgb(32, 33, 36);
+
+            // 2. 标签字体变白，背景变透明（完美融入背景）
+            if (lblScore != null)
+            {
+                lblScore.ForeColor = Color.White;
+                lblScore.BackColor = Color.Transparent;
+                lblScore.Font = new Font("Consolas", 12, FontStyle.Bold); // 顺手加粗一下字体
+            }
+
+            if (lbw1 != null)
+            {
+                lbw1.ForeColor = Color.White;
+                lbw1.BackColor = Color.Transparent;
+            }
+
+            // 3. 按钮扁平化（去掉老土的 3D 凸起感）
+            if (btnControl != null)
+            {
+                btnControl.FlatStyle = FlatStyle.Flat;
+                btnControl.BackColor = Color.FromArgb(50, 50, 55);
+                btnControl.ForeColor = Color.White;
+                btnControl.FlatAppearance.BorderColor = Color.FromArgb(100, 100, 100);
+                btnControl.Cursor = Cursors.Hand; // 鼠标移上去变成小手
+            }
+
             this.DoubleBuffered = true;
             this.ClientSize = new Size(400, 520);
             this.MinimumSize = this.Size;
@@ -26,7 +56,7 @@ namespace Tetirs
             engine.GameTick();
 
             // UI 同步更新
-            lblScore.Text = $"得分：{engine.Score}";
+            lblScore.Text = $"{engine.Score}";
             pbGameField.Invalidate();
             pbNextBlock.Invalidate();
 
@@ -40,7 +70,7 @@ namespace Tetirs
                 {
                     engine.ResetGame();
                     engine.SpawnBlock();
-                    lblScore.Text = "得分：0";
+                    lblScore.Text = "0";
                     btnControl.Text = "暂停游戏";
                     gameTimer.Start();
                 }
@@ -79,10 +109,15 @@ namespace Tetirs
         private void pbGameField_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
             float CellSize = (float)pbGameField.Width / engine.Cols;
 
             // 1. 画背景网格
-            Pen gridPen = new Pen(Color.FromArgb(40, 255, 255, 255));
+            Pen gridPen = new Pen(Color.FromArgb(40, 255, 255, 255)); // 保持 40 的极低透明度
+            gridPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot; // 【灵魂所在】改成点状虚线！
             for (int i = 0; i <= engine.Rows; i++) g.DrawLine(gridPen, 0, i * CellSize, engine.Cols * CellSize, i * CellSize);
             for (int j = 0; j <= engine.Cols; j++) g.DrawLine(gridPen, j * CellSize, 0, j * CellSize, engine.Rows * CellSize);
 
@@ -97,8 +132,9 @@ namespace Tetirs
                         float drawX = j * CellSize;
                         float drawY = i * CellSize;
 
-                        g.FillRectangle(new SolidBrush(fixedColor), drawX, drawY, CellSize - 1, CellSize - 1);
-                        g.DrawRectangle(Pens.White, drawX, drawY, CellSize - 1, CellSize - 1);
+                        float padding = 1.5f; // 给方块留出物理间隙
+                        g.FillRectangle(new SolidBrush(fixedColor), drawX + padding, drawY + padding, CellSize - padding * 2, CellSize - padding * 2);
+                        g.DrawRectangle(new Pen(Color.FromArgb(60, 0, 0, 0), 2), drawX + padding, drawY + padding, CellSize - padding * 2, CellSize - padding * 2);
                     }
                 }
             }
@@ -116,8 +152,9 @@ namespace Tetirs
                             float drawX = (engine.CurrentBlock.X + j) * CellSize;
                             float drawY = (engine.CurrentBlock.Y + i) * CellSize;
 
-                            g.FillRectangle(new SolidBrush(engine.CurrentBlock.BlockColor), drawX, drawY, CellSize - 1, CellSize - 1);
-                            g.DrawRectangle(Pens.White, drawX, drawY, CellSize - 1, CellSize - 1);
+                            float padding = 1.5f;
+                            g.FillRectangle(new SolidBrush(engine.CurrentBlock.BlockColor), drawX + padding, drawY + padding, CellSize - padding * 2, CellSize - padding * 2);
+                            g.DrawRectangle(new Pen(Color.FromArgb(60, 0, 0, 0), 2), drawX + padding, drawY + padding, CellSize - padding * 2, CellSize - padding * 2);
                         }
                     }
                 }
@@ -137,18 +174,47 @@ namespace Tetirs
                         {
                             float drawX = (engine.CurrentBlock.X + j) * CellSize;
                             float drawY = (ghostY + i) * CellSize;
-                            g.DrawRectangle(Pens.White, drawX, drawY, CellSize - 1, CellSize - 1);
+                           
+                            Color ghostColor = engine.CurrentBlock.BlockColor;
+                            float padding = 1.5f;
+
+                            g.FillRectangle(new SolidBrush(Color.FromArgb(30, ghostColor)), drawX + padding, drawY + padding, CellSize - padding * 2, CellSize - padding * 2);
+                            g.DrawRectangle(new Pen(Color.FromArgb(150, ghostColor), 2), drawX + padding, drawY + padding, CellSize - padding * 2, CellSize - padding * 2);
                         }
                     }
                 }
+            }
+
+            // 5. 画一圈科技感外边框 (类似街机屏幕的边框)
+            Pen screenBorder = new Pen(Color.FromArgb(100, 255, 255, 255), 2); // 半透明银白色，宽度2
+            g.DrawRectangle(screenBorder, 1, 1, pbGameField.Width - 2, pbGameField.Height - 2);
+            
+            if (engine.IsGameOver)
+            {
+                
+                g.FillRectangle(new SolidBrush(Color.FromArgb(180, 0, 0, 0)), 0, 0, pbGameField.Width, pbGameField.Height);
+
+                Font gameOverFont = new Font("Impact", 24, FontStyle.Bold);
+                SizeF textSize = g.MeasureString("游戏结束", gameOverFont);
+                float textX = (pbGameField.Width - textSize.Width) / 2;
+                float textY = (pbGameField.Height - textSize.Height) / 2;
+
+                g.DrawString("游戏结束", gameOverFont, Brushes.Red, textX, textY);
             }
         }
 
         private void pbNextBlock_Paint(object sender, PaintEventArgs e)
         {
+            Graphics g = e.Graphics;
+
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+            Pen smallBorder = new Pen(Color.FromArgb(100, 255, 255, 255), 2);
+            g.DrawRectangle(smallBorder, 1, 1, pbNextBlock.Width - 2, pbNextBlock.Height - 2);
+
             if (engine.NextBlock == null) return;
 
-            Graphics g = e.Graphics;
             float cellSize = Math.Min(pbNextBlock.Width, pbNextBlock.Height) / 5f;
 
             int size = engine.NextBlock.Shape.GetLength(0);
@@ -187,8 +253,9 @@ namespace Tetirs
                         float drawX = offsetX + j * cellSize;
                         float drawY = offsetY + i * cellSize;
 
-                        g.FillRectangle(new SolidBrush(engine.NextBlock.BlockColor), drawX, drawY, cellSize - 1, cellSize - 1);
-                        g.DrawRectangle(Pens.White, drawX, drawY, cellSize - 1, cellSize - 1);
+                        float padding = 1.5f;
+                        g.FillRectangle(new SolidBrush(engine.NextBlock.BlockColor), drawX + padding, drawY + padding, cellSize - padding * 2, cellSize - padding * 2);
+                        g.DrawRectangle(new Pen(Color.FromArgb(60, 0, 0, 0), 2), drawX + padding, drawY + padding, cellSize - padding * 2, cellSize - padding * 2);
                     }
                 }
             }
@@ -216,7 +283,7 @@ namespace Tetirs
                 gameTimer.Start();
 
                 btnControl.Text = "暂停游戏";
-                lblScore.Text = "得分：0";
+                lblScore.Text = "0";
 
                 pbGameField.Invalidate();
                 pbNextBlock.Invalidate();
@@ -252,5 +319,6 @@ namespace Tetirs
         }
 
         private void Form1_Load(object sender, EventArgs e) { }
+
     }
 }

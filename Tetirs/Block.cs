@@ -15,8 +15,16 @@ namespace Tetirs
         
         private static Random rand = new Random();
         private static List<Color> colorBag = new List<Color>();
-        private static readonly Color[] palette = { Color.Red, Color.Blue, Color.Green, Color.Orange, Color.Purple, Color.Cyan, Color.Yellow };
-
+       
+        private static readonly Color[] palette = {
+        Color.FromArgb(239, 32, 41),   // 热情红
+        Color.FromArgb(33, 150, 243),  // 经典蓝
+        Color.FromArgb(76, 175, 80),   // 荧光绿
+        Color.FromArgb(255, 152, 0),   // 活力橙
+        Color.FromArgb(156, 39, 176),  // 神秘紫
+        Color.FromArgb(0, 188, 212),   // 冰川青
+        Color.FromArgb(255, 235, 59)   // 闪耀黄
+};
         private static Color GetNextColor()
         {
             if (colorBag.Count == 0)
