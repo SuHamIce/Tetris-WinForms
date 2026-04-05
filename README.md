@@ -7,7 +7,10 @@
 本项目是一款基于 C# Windows Forms 开发的现代化俄罗斯方块游戏。
 在保留经典核心玩法的基础上，本版本对视觉 UI 和底层操控逻辑进行了全面重构，致力于提供“街机级”的沉浸式游玩体验和极致顺滑的操作手感。
 
-> **预览 (Preview)** > *(提示：建议在这里放一张你游戏运行时的截图。将截图上传到仓库后，修改此处的链接)* > `![游戏截图](./screenshot.png)`
+**预览 (Preview)**
+<p align="center">
+  <img width="300" alt="游戏运行截图" src="https://github.com/user-attachments/assets/ef38e351-9e7c-47a5-bb48-20cd1184a75e" />
+</p>
 
 ## ✨ 核心特性 (Features)
 
@@ -31,7 +34,7 @@
 ## 🚀 如何运行 (How to Run)
 
 ### 方法一：直接游玩 (玩家推荐)
-1. 点击本仓库右侧的 **[Releases]** 标签页（如果有发布的话）。
+1. 点击本仓库右侧的 **[Releases]** 标签页。
 2. 下载最新版本的 `.zip` 压缩包并解压。
 3. 双击运行 `Tetris.exe` 即可直接开始游戏，无需安装。
 
@@ -40,4 +43,4 @@
 1. 确保你的电脑上安装了 **Visual Studio** (推荐 2019 或更新版本)，并勾选了 `.NET 桌面开发` 工作负载。
 2. 克隆本仓库到本地：
    ```bash
-   git clone [https://github.com/SuHamIce/Tetris-WinForms.git](https://github.com/SuHamIce/Tetris-WinForms.git)
+   git clone https://github.com/SuHamIce/Tetris-WinForms.git
